@@ -264,49 +264,49 @@ menu: nav/home.html
   }
 };
 /**
-   * ✅ PROCEDURE: matchMood()
-   * - Takes input (mood, time)
-   * - Uses SEQUENCING: Step-by-step operations
-   * - Uses SELECTION: if-else conditions to handle logic
-   * - Uses ITERATION: loops through matching songs
-   * - Outputs text based on selected song (visual output)
-   */
-  // Procedure to match the mood and time with an appropriate song
-  // This function takes two parameters: mood and time, which are selected by the user.
-  function matchMood() {
-    // 📥 Step 1: INPUT — Get user selections
-    // 🧩 Step 1: Get user input (Sequencing Step 1)
-    const mood = document.getElementById("mood").value;
-    const time = document.getElementById("time").value;
+ * ✅ PROCEDURE: matchMood()
+ * - Takes input (mood, time)
+ * - Uses SEQUENCING: Step-by-step operations
+ * - Uses SELECTION: if-else conditions to handle logic
+ * - Uses ITERATION: loops through matching songs
+ * - Outputs text based on selected song (visual output)
+ */
+// Procedure to match the mood and time with an appropriate song
+// This function takes two parameters: mood and time, which are selected by the user.
+function matchMood() {
+  // 📥 Step 1: INPUT — Get user selections
+  // 🧩 Step 1: Get user input (Sequencing Step 1)
+  const mood = document.getElementById("mood").value;
+  const time = document.getElementById("time").value;
 
-    // 📦 Step 2: Access output elements
-    const resultDiv = document.getElementById("result");
-    const listOutput = document.getElementById("listOutput");
+  // 📦 Step 2: Access output elements
+  const resultDiv = document.getElementById("result");
+  const listOutput = document.getElementById("listOutput");
 
-    // 📚 Step 3: Look up song list based on mood and time
-    const options = musicData[mood] && musicData[mood][time];
+  // 📚 Step 3: Look up song list based on mood and time
+  // Check if the mood and time exist in musicData before accessing
+  if (musicData[mood] && musicData[mood][time]) {
+    const options = musicData[mood][time];
 
-    // 🔀 SELECTION: Check if valid songs exist
-    if (options && options.length > 0) {
-
-      // 🔁 ITERATION: Loop to display all possible songs
-      let songList = "🎶 Matching Songs:<br>";
-      for (let i = 0; i < options.length; i++) {
-        songList += `• ${options[i]}<br>`;
-      }
-      listOutput.innerHTML = songList;
-
-      // 🎯 SELECTION + RANDOM CHOICE
-      const randomIndex = Math.floor(Math.random() * options.length);
-      const selectedSong = options[randomIndex];
-
-      // 📤 OUTPUT: Display suggested song
-      resultDiv.textContent = `🎧 Try this: ${selectedSong}`;
-    } else {
-      // ❌ No matches found
-      // if no matchs found this error message is shown
-      listOutput.innerHTML = "";
-      resultDiv.textContent = `😔 Sorry, no songs found for that mood/time.`;
+    // 🔁 ITERATION: Loop to display all possible songs
+    let songList = "🎶 Matching Songs:<br>";
+    for (let i = 0; i < options.length; i++) {
+      songList += `• ${options[i]}<br>`;
     }
+    listOutput.innerHTML = songList;
+
+    // 🎯 SELECTION + RANDOM CHOICE
+    const randomIndex = Math.floor(Math.random() * options.length);
+    const selectedSong = options[randomIndex];
+
+    // 📤 OUTPUT: Display suggested song
+    resultDiv.textContent = `🎧 Try this: ${selectedSong}`;
+  } else {
+    // ❌ No matches found
+    // if no matches found this error message is shown
+    listOutput.innerHTML = "";
+    resultDiv.textContent = `😔 Sorry, no songs found for that mood/time.`;
   }
+}
+
 </script>
