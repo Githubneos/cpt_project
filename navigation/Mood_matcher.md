@@ -6,8 +6,7 @@ permalink: /navigation/mood
 author: Keerthan
 ---
  <!-- Background style -->
-<style> 
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+<style> ;
 
   body {
     font-family: 'Poppins', sans-serif;
