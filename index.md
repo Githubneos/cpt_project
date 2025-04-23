@@ -261,6 +261,9 @@ menu: nav/home.html
     late_evening: ["Coffee - Beabadoobee", "Lost in Japan - Shawn Mendes"],
     night: ["Come Through - Jeremy Zucker", "Riptide - Vance Joy"],
     midnight: ["Night Owl - Galimatias", "I Wanna Be Yours - Arctic Monkeys"]
+    
+    <div id="listOutput"></div>
+
   }
 };
 /**
@@ -293,7 +296,7 @@ function matchMood() {
     for (let i = 0; i < options.length; i++) {
       songList += `• ${options[i]}<br>`;
     }
-    listOutput.innerHTML = musicData;
+    listOutput.innerHTML = songList;
 
     // 🎯 SELECTION + RANDOM CHOICE
     const randomIndex = Math.floor(Math.random() * options.length);
