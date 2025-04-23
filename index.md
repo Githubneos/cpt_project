@@ -20,7 +20,19 @@ menu: nav/home.html
   <h3>🧠 Suggested Task:</h3>
   <p id="suggestedTask">No tasks yet.</p>
 
-  <ul id="taskList"></ul>
+  <h3>📅 Task List</h3>
+  <!-- ✅ Table for better visual output -->
+  <table id="taskTable" border="1" style="width:100%; margin-top: 10px; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th>Task</th>
+        <th>Time (min)</th>
+        <th>Deadline</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 </div>
 
 <style>
@@ -39,7 +51,7 @@ menu: nav/home.html
     padding: 25px;
     border-radius: 16px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    width: 400px;
+    width: 500px;
     text-align: center;
   }
 
@@ -58,24 +70,30 @@ menu: nav/home.html
     cursor: pointer;
   }
 
-  ul {
-    margin-top: 20px;
-    text-align: left;
+  th, td {
+    padding: 8px;
+    text-align: center;
   }
 
-  li {
-    background: #f0f0f0;
-    margin: 5px 0;
-    padding: 8px;
+  th {
+    background-color: #f0f0f0;
+  }
+
+  td button {
+    padding: 5px 10px;
+    background-color: #f44336;
+    color: white;
     border-radius: 6px;
+    border: none;
+    cursor: pointer;
   }
 </style>
 
 <script>
-  // ✅ LIST used to manage all task data and help sort, suggest, display tasks
+  // ✅ COLLECTION (list) to store task objects
   let tasks = [];
 
-  // ✅ PROCEDURE: Gets input and sends data as parameters
+  // ✅ INPUT procedure: gets input and uses parameters
   function handleNewTask() {
     const name = document.getElementById("taskName").value;
     const time = parseInt(document.getElementById("timeNeeded").value);
@@ -83,67 +101,82 @@ menu: nav/home.html
 
     if (!name || isNaN(time) || isNaN(deadline.getTime())) return;
 
-    // ✅ Parameters passed to addTask
+    // ✅ Calling with parameters
     addTask(name, time, deadline);
   }
 
-  // ✅ PROCEDURE
+  // ✅ PROCEDURE with parameters & sequencing
   // ✅ Parameters: name (string), time (int), deadline (Date)
-  // ✅ Return Type: void
-  // ✅ Sequencing: push → sort → display
+  // ✅ Return type: void
   function addTask(name, time, deadline) {
-    const task = { name, time, deadline };
+    const task = { name, time, deadline: deadline.toISOString() };
 
-    // ✅ COLLECTION (list): used to store structured task objects
+    // ✅ Add to collection
     tasks.push(task);
 
-    // ✅ Sorting tasks using a list to manage complexity
-    tasks.sort((a, b) => a.deadline - b.deadline);
+    // ✅ Sequencing: push → sort → store → display
+    tasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    saveTasks(); // ✅ Save to local storage
 
-    displayTasks();   // ✅ Call to custom procedure
-    suggestTask();    // ✅ Call to custom procedure
+    displayTasks();   // ✅ Procedure call
+    suggestTask();    // ✅ Procedure call
   }
 
-  // ✅ PROCEDURE: Recommends next task based on list sorting
-  // ✅ Uses SELECTION (if length 0), then shows next task
+  // ✅ PROCEDURE: visual and textual output
   function suggestTask() {
     if (tasks.length === 0) {
       document.getElementById("suggestedTask").textContent = "You're all caught up!";
       return;
     }
 
-    const top = tasks[0]; // ✅ Top task (most urgent)
+    const top = tasks[0];
     document.getElementById("suggestedTask").textContent =
-      `${top.name} - ${top.time} mins - Due: ${top.deadline.toLocaleString()}`;
+      `${top.name} - ${top.time} mins - Due: ${new Date(top.deadline).toLocaleString()}`;
   }
 
-  // ✅ PROCEDURE to display list of tasks
-  // ✅ ITERATION: loops through the task list to output UI
+  // ✅ PROCEDURE using ITERATION to display table
   function displayTasks() {
-    const list = document.getElementById("taskList");
-    list.innerHTML = "";
+    const table = document.querySelector("#taskTable tbody");
+    table.innerHTML = "";
 
+    // ✅ Loop through collection
     tasks.forEach((task, index) => {
-      const li = document.createElement("li");
-      li.textContent = `${task.name} - ${task.time} mins - Due: ${task.deadline.toLocaleString()}`;
+      const row = document.createElement("tr");
 
-      // ✅ Done button to remove task (list management)
-      const doneBtn = document.createElement("button");
-      doneBtn.textContent = "✅ Done";
-      doneBtn.onclick = () => {
-        tasks.splice(index, 1);  // ✅ Remove from list
-        displayTasks();
-        suggestTask();
-      };
+      row.innerHTML = `
+        <td>${task.name}</td>
+        <td>${task.time}</td>
+        <td>${new Date(task.deadline).toLocaleString()}</td>
+        <td><button onclick="removeTask(${index})">Done</button></td>
+      `;
 
-      doneBtn.style.marginLeft = "10px";
-      doneBtn.style.background = "#f44336";
-      doneBtn.style.color = "white";
-      doneBtn.style.border = "none";
-      doneBtn.style.padding = "5px 10px";
-      doneBtn.style.borderRadius = "6px";
-      li.appendChild(doneBtn);
-      list.appendChild(li);
+      table.appendChild(row);
     });
   }
+
+  // ✅ PROCEDURE to delete task from collection
+  function removeTask(index) {
+    tasks.splice(index, 1);       // ✅ Selection & modification
+    saveTasks();                  // ✅ Save change
+    displayTasks();               // ✅ Re-render
+    suggestTask();                // ✅ Recalculate suggestion
+  }
+
+  // ✅ PROCEDURE: saves tasks
+  function saveTasks() {
+    localStorage.setItem("studyTasks", JSON.stringify(tasks));
+  }
+
+  // ✅ PROCEDURE: loads tasks (device input)
+  function loadTasks() {
+    const saved = localStorage.getItem("studyTasks");
+    if (saved) {
+      tasks = JSON.parse(saved);
+      displayTasks();
+      suggestTask();
+    }
+  }
+
+  // ✅ Load tasks at startup (device input)
+  window.onload = loadTasks;
 </script>
