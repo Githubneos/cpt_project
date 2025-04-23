@@ -293,7 +293,7 @@ function matchMood() {
     for (let i = 0; i < options.length; i++) {
       songList += `• ${options[i]}<br>`;
     }
-    listOutput.innerHTML = songList;
+    listOutput.innerHTML = musicData;
 
     // 🎯 SELECTION + RANDOM CHOICE
     const randomIndex = Math.floor(Math.random() * options.length);
