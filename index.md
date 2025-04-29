@@ -91,55 +91,76 @@ menu: nav/home.html
 
 <script>
   // ✅ COLLECTION (list) to store task objects
-  let tasks = [];
+  let tasks = []; // List of tasks stored as objects
 
   // ✅ INPUT procedure: gets input and uses parameters
+  // **Return Type**: void
+  // **Parameters**: None (inputs come from the HTML form)
   function handleNewTask() {
     const name = document.getElementById("taskName").value;
     const time = parseInt(document.getElementById("timeNeeded").value);
     const deadline = new Date(document.getElementById("deadline").value);
 
-    if (!name || isNaN(time) || isNaN(deadline.getTime())) return;
+    if (!name || isNaN(time) || isNaN(deadline.getTime())) return; // Input validation
 
-    // ✅ Calling with parameters
+    // ✅ Calling with parameters to add the task
     addTask(name, time, deadline);
   }
 
-  // ✅ PROCEDURE with parameters & sequencing
-  // ✅ Parameters: name (string), time (int), deadline (Date)
-  // ✅ Return type: void
+  // ✅ PROCEDURE to add a task to the list
+  // **Return Type**: void
+  // **Parameters**: 
+  // - name (string): The name of the task
+  // - time (number): The estimated time (in minutes) to complete the task
+  // - deadline (Date): The deadline of the task
   function addTask(name, time, deadline) {
     const task = { name, time, deadline: deadline.toISOString() };
 
-    // ✅ Add to collection
-    tasks.push(task);
+    tasks.push(task); // Add task to the list
 
-    // ✅ Sequencing: push → sort → store → display
-    tasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
-    saveTasks(); // ✅ Save to local storage
-
-    displayTasks();   // ✅ Procedure call
-    suggestTask();    // ✅ Procedure call
+    tasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline)); // Sort tasks by deadline
+    saveTasks(); // Save tasks to local storage
+    displayTasks(); // Display tasks on the table
+    suggestTask(); // Suggest the next task based on the earliest deadline
   }
 
-  // ✅ PROCEDURE: visual and textual output
+  // ✅ PROCEDURE to suggest the task with the earliest deadline
+  // **Return Type**: void
+  // **Parameters**: None (works with the tasks list)
   function suggestTask() {
+    // Sequencing: Check if the task list is empty
     if (tasks.length === 0) {
       document.getElementById("suggestedTask").textContent = "You're all caught up!";
-      return;
+      return; // If no tasks, show a message and exit
     }
 
-    const top = tasks[0];
+    let bestTask = tasks[0]; // Assume the first task is the best task
+    let soonestDeadline = new Date(tasks[0].deadline); // Store the first task's deadline
+
+    // Iteration: Go through each task to find the one with the earliest deadline
+    for (let i = 1; i < tasks.length; i++) {
+      const currentTaskDeadline = new Date(tasks[i].deadline);
+
+      // Selection: If current task has an earlier deadline, update bestTask
+      if (currentTaskDeadline < soonestDeadline) {
+        bestTask = tasks[i];
+        soonestDeadline = currentTaskDeadline;
+      }
+    }
+
+    // Update the suggested task display
     document.getElementById("suggestedTask").textContent =
-      `${top.name} - ${top.time} mins - Due: ${new Date(top.deadline).toLocaleString()}`;
+      `${bestTask.name} - ${bestTask.time} mins - Due: ${soonestDeadline.toLocaleString()}`;
   }
 
-  // ✅ PROCEDURE using ITERATION to display table
+  // ✅ PROCEDURE to display tasks in a table
+  // **Return Type**: void
+  // **Parameters**: None (works with the tasks list)
   function displayTasks() {
     const table = document.querySelector("#taskTable tbody");
-    table.innerHTML = "";
+    table.innerHTML = ""; // Clear the table
 
-    // ✅ Loop through collection
+    // Iteration: Loop through tasks and add each one to the table
     tasks.forEach((task, index) => {
       const row = document.createElement("tr");
 
@@ -154,29 +175,45 @@ menu: nav/home.html
     });
   }
 
-  // ✅ PROCEDURE to delete task from collection
+  // ✅ PROCEDURE to remove a task from the list
+  // **Return Type**: void
+  // **Parameters**: 
+  // - index (number): The index of the task to remove
   function removeTask(index) {
-    tasks.splice(index, 1);       // ✅ Selection & modification
-    saveTasks();                  // ✅ Save change
-    displayTasks();               // ✅ Re-render
-    suggestTask();                // ✅ Recalculate suggestion
+    tasks.splice(index, 1); // Remove the task from the list by index
+    saveTasks(); // Save the updated tasks
+    displayTasks(); // Re-render the task list
+    suggestTask(); // Update the suggested task
   }
 
-  // ✅ PROCEDURE: saves tasks
+  // ✅ PROCEDURE to save tasks to local storage
+  // **Return Type**: void
+  // **Parameters**: None (uses tasks list)
   function saveTasks() {
-    localStorage.setItem("studyTasks", JSON.stringify(tasks));
+    localStorage.setItem("studyTasks", JSON.stringify(tasks)); // Save the tasks as a JSON string
   }
 
-  // ✅ PROCEDURE: loads tasks (device input)
+  // ✅ PROCEDURE to load tasks from local storage
+  // **Return Type**: void
+  // **Parameters**: None (loads saved tasks)
   function loadTasks() {
     const saved = localStorage.getItem("studyTasks");
     if (saved) {
-      tasks = JSON.parse(saved);
-      displayTasks();
-      suggestTask();
+      tasks = JSON.parse(saved); // Load tasks from local storage
+    } else {
+      // ✅ If no saved tasks, load some example tasks
+      tasks = [
+        { name: "APUSH Chapter 22 Reading", time: 45, deadline: new Date(Date.now() + 2 * 3600000).toISOString() },
+        { name: "Physics Worksheet", time: 30, deadline: new Date(Date.now() + 4 * 3600000).toISOString() },
+        { name: "Calculus BC Homework", time: 60, deadline: new Date(Date.now() + 6 * 3600000).toISOString() },
+        { name: "Study Psychology Unit 5", time: 50, deadline: new Date(Date.now() + 8 * 3600000).toISOString() },
+      ];
+      saveTasks(); // Save these sample tasks to local storage
     }
+    displayTasks(); // Display the tasks
+    suggestTask(); // Update the suggested task
   }
 
-  // ✅ Load tasks at startup (device input)
+  // ✅ Load tasks when the page loads
   window.onload = loadTasks;
 </script>
